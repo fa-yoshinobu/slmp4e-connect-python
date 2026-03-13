@@ -47,8 +47,9 @@ The current validated matrix is tracked in [internal_docs/iqr_r08cpu/device_acce
 If you just want to use the library:
 
 1. Read [USER_GUIDE.md](USER_GUIDE.md).
-2. Run the safe smoke checks in [TESTING.md](TESTING.md).
-3. Check [ERROR_CODES.md](ERROR_CODES.md) when the PLC returns an end code.
+2. Try the runnable examples in [samples/README.md](samples/README.md).
+3. Run the safe smoke checks in [TESTING.md](TESTING.md).
+4. Check [ERROR_CODES.md](ERROR_CODES.md) when the PLC returns an end code.
 
 If you are maintaining this repository:
 
@@ -67,6 +68,8 @@ For development from a local checkout:
 ```powershell
 python -m pip install -e ".[dev]"
 ```
+
+Runnable examples are available under [samples/README.md](samples/README.md).
 
 ## Quick Example
 
@@ -159,6 +162,7 @@ Target-specific practical notes and the current report set are indexed in [inter
 ## Documentation Map
 
 - [USER_GUIDE.md](USER_GUIDE.md): how to use the Python API and CLI safely
+- [samples/README.md](samples/README.md): runnable application-side Python examples
 - [TESTING.md](TESTING.md): local checks, live-test order, and report policy
 - [ERROR_CODES.md](ERROR_CODES.md): quick interpretation of common end codes
 - [BIT_DEVICE_ACCESS_TABLE.md](BIT_DEVICE_ACCESS_TABLE.md): bit-device read/write behavior by access form

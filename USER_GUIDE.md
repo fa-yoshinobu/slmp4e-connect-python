@@ -3,6 +3,7 @@
 This guide is the fastest way to start using the library safely.
 
 Use [TESTING.md](TESTING.md) for local and live verification steps. Use [ERROR_CODES.md](ERROR_CODES.md) when the PLC returns an end code.
+If you prefer runnable copy-start examples, use [samples/README.md](samples/README.md).
 
 ## 1. Scope
 
