@@ -10,6 +10,7 @@ SLMP4E Connect Python is a Python library and CLI toolkit for Mitsubishi SLMP 4E
 It is built for engineers who need broad PLC device coverage, typed APIs, and practical behavior validated against a real MELSEC target instead of protocol-only examples.
 
 Repository: `https://github.com/fa-yoshinobu/slmp4e-connect-python`
+
 License: `MIT`
 Copyright: `Copyright (c) 2026 fa-yoshinobu`
 
