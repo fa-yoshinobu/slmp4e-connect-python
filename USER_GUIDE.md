@@ -216,6 +216,12 @@ Label-side conditions matter:
 
 ## 10. Memory and CPU Buffer Access
 
+Status on this project: conditional / advanced only.
+
+Do not treat this section as a broadly validated normal application path. Memory writes, extend-unit writes, and CPU-buffer writes can directly change PLC state. On the current validated target, the `cpu_buffer_*` helpers are only a practical `0601/1601` workaround and must not be treated as a generally confirmed substitute for direct `G/HG` or Appendix 1 access.
+
+Use this area only after revalidation on the actual PLC and only when normal device access does not fit the job.
+
 Own-station memory:
 
 ```python
@@ -243,13 +249,18 @@ with SLMP4EClient("192.168.250.101", port=1025, transport="tcp", plc_series="iqr
 
 Practical rule on the validated target:
 
-- prefer `cpu_buffer_read_*` and `cpu_buffer_write_*`
+- treat `cpu_buffer_*` as a target-specific workaround, not as a generally portable feature
 - direct `G/HG` access is still unresolved
 - Appendix 1 `G/HG` is also unresolved on the current PLC
+- do not assume memory / extend-unit write paths are safe just because the API exists
 
 ## 11. Appendix 1 Access
 
-Use the `_ext` APIs only when you actually need Appendix 1 fields:
+Status on this project: under investigation.
+
+Do not assume Appendix 1 access works correctly just because the `_ext` APIs exist. On the current validated target, Appendix 1 handling remains highly environment-dependent, and `G/HG`-related Appendix 1 paths are still unresolved / rejected.
+
+Treat the example below as payload-shape reference only, not as a generally verified workflow:
 
 ```python
 with SLMP4EClient("192.168.250.101", port=1025, transport="tcp", plc_series="ql") as cli:
@@ -272,6 +283,7 @@ Use:
 - `0xFA` for CPU buffer access
 
 Appendix 1 behavior is highly environment-dependent. Revalidate it on the actual PLC before depending on it.
+If Appendix 1 is business-critical for your use case, treat it as "not yet confirmed" until you verify the exact target/device/path combination yourself.
 
 ## 12. Remote Control and Password
 
@@ -300,9 +312,11 @@ Warnings:
 
 ## 13. File Commands
 
-File helpers are implemented, but the current validated target still rejects most `18xx` paths.
+Status on this project: not generally usable on the validated target.
 
-Typical flow:
+File helpers are implemented, but the current validated target still rejects most `18xx` paths. Treat this family as unresolved / environment-dependent unless your own PLC proves otherwise.
+
+The flow below is API-shape reference only. It is not a generally confirmed working sequence on the current validated target:
 
 ```python
 with SLMP4EClient("192.168.250.101", port=1025, transport="tcp", plc_series="iqr") as cli:
@@ -316,11 +330,16 @@ with SLMP4EClient("192.168.250.101", port=1025, transport="tcp", plc_series="iqr
 
 Practical note:
 
-- treat the file family as environment-dependent until your PLC confirms it
+- treat the file family as unresolved until your PLC confirms it
+- do not present file-command support to application users as a stable feature on the current validated baseline
 
 ## 14. Ondemand Receive
 
 `2101` is PLC-initiated. Do not send it as a normal request.
+
+Status on this project: outside routine verification and not confirmed as a general application workflow.
+
+This path only makes sense when the PLC actively sends an ondemand frame. The example below is a receive-side skeleton, not a generally verified "works everywhere" feature. Use it only when you control the PLC-side trigger and can validate the full end-to-end behavior on your own setup.
 
 ```python
 with SLMP4EClient("192.168.250.101", port=1025, transport="tcp", plc_series="iqr") as cli:

@@ -48,7 +48,7 @@ Prefer these APIs on the validated iQ-R target:
 - `read_lts_states(...)`
 - `read_lstc_states(...)`
 - `read_lsts_states(...)`
-- `cpu_buffer_read_*` / `cpu_buffer_write_*`
+- `cpu_buffer_read_*` / `cpu_buffer_write_*` only as a target-specific workaround, not as a generally portable feature
 
 Do not treat these as reliable on the current validated target:
 
@@ -56,6 +56,9 @@ Do not treat these as reliable on the current validated target:
 - direct `HG`
 - direct `S`
 - direct `LTC/LTS/LSTC/LSTS` reads
+- Appendix 1 access as a general feature
+- file-command workflows as a stable feature
+- ondemand receive as a routine verified application path
 
 ## Where to Look Next
 
