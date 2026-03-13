@@ -12,6 +12,7 @@ It is built for engineers who need broad PLC device coverage, typed APIs, and pr
 Repository: `https://github.com/fa-yoshinobu/slmp4e-connect-python`
 
 License: `MIT`
+
 Copyright: `Copyright (c) 2026 fa-yoshinobu`
 
 Why this project stands out:
