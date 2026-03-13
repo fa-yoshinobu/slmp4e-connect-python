@@ -1,5 +1,10 @@
 # SLMP4E Connect Python
 
+[![Release](https://img.shields.io/github/v/release/fa-yoshinobu/slmp4e-connect-python)](https://github.com/fa-yoshinobu/slmp4e-connect-python/releases)
+[![CI](https://github.com/fa-yoshinobu/slmp4e-connect-python/actions/workflows/ci.yml/badge.svg)](https://github.com/fa-yoshinobu/slmp4e-connect-python/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/fa-yoshinobu/slmp4e-connect-python)](https://github.com/fa-yoshinobu/slmp4e-connect-python/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/fa-yoshinobu/slmp4e-connect-python/blob/main/pyproject.toml)
+
 SLMP4E Connect Python is a Python library and CLI toolkit for Mitsubishi SLMP 4E binary communication.
 
 It is built for engineers who need broad PLC device coverage, typed APIs, and practical behavior validated against a real MELSEC target instead of protocol-only examples.
