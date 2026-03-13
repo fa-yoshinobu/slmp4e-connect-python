@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slmp4e-connect-python"
+version = "0.1.0"
+description = "SLMP4E Connect Python: client library for Mitsubishi SLMP 4E binary communication"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+authors = [{ name = "fa-yoshinobu" }]
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["slmp", "melsec", "mitsubishi", "plc", "4e", "binary"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+]
+
+[project.urls]
+Homepage = "https://github.com/fa-yoshinobu/slmp4e-connect-python"
+Repository = "https://github.com/fa-yoshinobu/slmp4e-connect-python"
+Issues = "https://github.com/fa-yoshinobu/slmp4e-connect-python/issues"
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+    "ruff>=0.6",
+    "twine>=5.1",
+]
+
+[project.scripts]
+slmp4e-connection-check = "slmp4e.cli:connection_check_main"
+slmp4e-device-range-probe = "slmp4e.cli:device_range_probe_main"
+slmp4e-register-boundary-probe = "slmp4e.cli:register_boundary_probe_main"
+slmp4e-other-station-check = "slmp4e.cli:other_station_check_main"
+slmp4e-open-items-recheck = "slmp4e.cli:open_items_recheck_main"
+slmp4e-pending-live-verification = "slmp4e.cli:pending_live_verification_main"
+slmp4e-init-model-docs = "slmp4e.cli:init_model_docs_main"
+slmp4e-device-access-matrix-sync = "slmp4e.cli:device_access_matrix_sync_main"
+slmp4e-manual-write-verification = "slmp4e.cli:manual_write_verification_main"
+slmp4e-manual-label-verification = "slmp4e.cli:manual_label_verification_main"
+slmp4e-read-soak = "slmp4e.cli:read_soak_main"
+slmp4e-mixed-read-load = "slmp4e.cli:mixed_read_load_main"
+slmp4e-tcp-concurrency = "slmp4e.cli:tcp_concurrency_main"
+
+[tool.setuptools.packages.find]
+include = ["slmp4e*"]
+
+[tool.setuptools.package-data]
+slmp4e = ["py.typed"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["slmp4e"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["slmp4e", "scripts"]
+warn_unused_configs = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+strict_equality = true
