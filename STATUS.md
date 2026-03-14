@@ -22,6 +22,12 @@ Primary validated target:
 - `UDP 1027`
 - `series=iqr`
 
+Latest mixed-block live note on the validated target:
+
+- mixed `write_block(...)` as one `1406/0002` request was reproduced as `0xC05B`
+- equivalent word-only and bit-only block writes were both `OK`
+- `retry_mixed_on_error=True` was live-verified as a working fallback
+
 ## Implemented Areas
 
 - normal device read/write
@@ -49,6 +55,7 @@ Prefer these APIs on the validated iQ-R target:
 - `read_lstc_states(...)`
 - `read_lsts_states(...)`
 - `cpu_buffer_read_*` / `cpu_buffer_write_*` only as a target-specific workaround, not as a generally portable feature
+- `write_block(..., split_mixed_blocks=True)` or `write_block(..., retry_mixed_on_error=True)` when a target rejects one mixed word+bit block write
 
 Do not treat these as reliable on the current validated target:
 

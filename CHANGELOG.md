@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.1 - 2026-03-14
+
+Mixed block write compatibility update for the validated iQ-R target.
+
+### Added
+
+- `retry_mixed_on_error=True` fallback for `write_block(...)` so one mixed `1406/0002` write can recover by retrying as separate word-only and bit-only block writes on known rejection end codes
+- `scripts/slmp_mixed_block_compare.py` for focused live comparison of mixed block read/write behavior
+- focused unit tests for the mixed-write retry path
+- validated-target comparison notes under `internal_docs/iqr_r08cpu/`
+
+### Changed
+
+- documentation now records that one-request mixed `writeBlock` on the validated `R08CPU` target reproduces `0xC05B`
+- practical guidance now recommends `split_mixed_blocks=True` or `retry_mixed_on_error=True` when a PLC rejects one mixed word+bit block write
+- project status and open-items tracking were updated with the latest live verification result
+
+### Live Validation
+
+- one-request mixed `writeBlock(D300 x2 + M200 x1 packed)` reproduced `0xC05B`
+- equivalent word-only and bit-only block writes remained `OK`
+- `retry_mixed_on_error=True` was live-verified as a working fallback on the validated target
+
 ## 0.1.0 - 2026-03-13
 
 Initial packaged release for the current repository scope.

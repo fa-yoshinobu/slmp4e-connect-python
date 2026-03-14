@@ -20,6 +20,7 @@ If you need to validate unresolved behavior, use:
 - `slmp_open_items_recheck.py`
 - `slmp_pending_live_verification.py`
 - `slmp_special_device_probe.py`
+- `slmp_mixed_block_compare.py`
 
 If you need human confirmation, use:
 
@@ -51,6 +52,8 @@ If you need human confirmation, use:
   - Current workflow excludes `1006 remote reset` and treats `2101` as out of scope.
 - `slmp_special_device_probe.py`
   - Focused recheck for `G/HG` and `LT/LST` related paths.
+- `slmp_mixed_block_compare.py`
+  - Checklist-oriented live compare for word-only, bit-only, and mixed `0406/1406` block access.
 
 ### Human-in-the-loop verification
 

@@ -42,6 +42,7 @@ If you only need the current practical picture, read these first:
 - [open_items_recheck_latest.md](open_items_recheck_latest.md)
 - [special_device_probe_latest.md](special_device_probe_latest.md)
 - [other_station_check_latest.md](other_station_check_latest.md)
+- [mixed_block_compare_latest.md](mixed_block_compare_latest.md)
 
 ### Human-confirmed verification
 
@@ -79,6 +80,7 @@ If you only need the current practical picture, read these first:
 
 - [u4_g0_probe_latest.md](u4_g0_probe_latest.md)
 - [u4_module_no_0004_range_probe_latest.md](u4_module_no_0004_range_probe_latest.md)
+- [slmp4e_connect_python_comparison_checklist.md](slmp4e_connect_python_comparison_checklist.md)
 
 ## Supporting Inputs
 

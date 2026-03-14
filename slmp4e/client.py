@@ -733,12 +733,17 @@ class SLMP4EClient:
         bit_blocks: Sequence[tuple[str | DeviceRef, Sequence[int]]] = (),
         series: PLCSeries | str | None = None,
         split_mixed_blocks: bool = False,
+        retry_mixed_on_error: bool = False,
     ) -> None:
         """Write word blocks and bit-device word blocks.
 
         `bit_blocks` values are packed 16-bit words for bit devices, not a
         per-bit boolean list. For example, writing `[0x0005]` to `M1000`
         sets the packed pattern for `M1000..M1015`.
+
+        If `retry_mixed_on_error=True`, a mixed word+bit write first uses one
+        `1406` request and then retries as split word-only and bit-only writes
+        when the PLC returns a known mixed-write rejection end code.
         """
         if not word_blocks and not bit_blocks:
             raise ValueError("word_blocks and bit_blocks must not both be empty")
@@ -750,12 +755,14 @@ class SLMP4EClient:
                 bit_blocks=(),
                 series=series,
                 split_mixed_blocks=False,
+                retry_mixed_on_error=False,
             )
             self.write_block(
                 word_blocks=(),
                 bit_blocks=bit_blocks,
                 series=series,
                 split_mixed_blocks=False,
+                retry_mixed_on_error=False,
             )
             return
         s = PLCSeries(series) if series is not None else self.plc_series
@@ -784,7 +791,45 @@ class SLMP4EClient:
         for _, values in bit_blocks:
             for value in values:
                 payload += int(value).to_bytes(2, "little", signed=False)
-        self.request(Command.DEVICE_WRITE_BLOCK, subcommand=sub, data=bytes(payload))
+        resp = self.request(
+            Command.DEVICE_WRITE_BLOCK,
+            subcommand=sub,
+            data=bytes(payload),
+            raise_on_error=False,
+        )
+        if resp.end_code == 0:
+            return
+        if (
+            retry_mixed_on_error
+            and word_blocks
+            and bit_blocks
+            and resp.end_code in _MIXED_BLOCK_RETRY_END_CODES
+        ):
+            warnings.warn(
+                (
+                    f"mixed block write was rejected with 0x{resp.end_code:04X}; "
+                    "retrying as separate word-only and bit-only block writes"
+                ),
+                SLMPPracticalPathWarning,
+                stacklevel=2,
+            )
+            self.write_block(
+                word_blocks=word_blocks,
+                bit_blocks=(),
+                series=series,
+                split_mixed_blocks=False,
+                retry_mixed_on_error=False,
+            )
+            self.write_block(
+                word_blocks=(),
+                bit_blocks=bit_blocks,
+                series=series,
+                split_mixed_blocks=False,
+                retry_mixed_on_error=False,
+            )
+            return
+        if self.raise_on_error:
+            _raise_response_error(resp, command=Command.DEVICE_WRITE_BLOCK, subcommand=sub)
 
     def read_long_timer(
         self,
@@ -1744,6 +1789,17 @@ _LT_LST_DIRECT_CODES = frozenset({"LTC", "LTS", "LSTC", "LSTS"})
 _CPU_BUFFER_CODES = frozenset({"G", "HG"})
 _TEMPORARILY_UNSUPPORTED_TYPED_CODES = frozenset({"G", "HG", "S"})
 _BOUNDARY_START_ACCEPTANCE_CODES = frozenset({"R", "ZR"})
+_MIXED_BLOCK_RETRY_END_CODES = frozenset({0xC05B})
+
+
+def _raise_response_error(response: SLMPResponse, *, command: int | Command, subcommand: int) -> None:
+    if response.end_code == 0:
+        return
+    raise SLMPError(
+        f"SLMP error end_code=0x{response.end_code:04X} command=0x{int(command):04X} subcommand=0x{subcommand:04X}",
+        end_code=response.end_code,
+        data=response.data,
+    )
 
 
 def _check_temporarily_unsupported_device(ref: DeviceRef) -> None:

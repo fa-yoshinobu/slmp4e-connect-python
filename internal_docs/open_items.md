@@ -2,7 +2,7 @@
 
 ## Last Updated
 
-- date: 2026-03-13
+- date: 2026-03-14
 - PLC: Mitsubishi MELSEC iQ-R `R08CPU`
 - host: `192.168.250.101`
 - main transports: `TCP 1025`, `UDP 1027`
@@ -33,6 +33,20 @@
   - `1828`, `1829`, `182A` -> `SKIP` because the file handle never opened
 - current interpretation:
   - this family is still blocked by the PLC file environment or accepted-condition rules
+
+### Mixed block write root cause
+
+- current result on the validated target:
+  - one-request mixed `write_block(D300 x2 + M200 x1 packed)` returned `0xC05B`
+  - the first failed mixed write left PLC memory unchanged
+  - `retry_mixed_on_error=True` then succeeded by retrying as separate word-only and bit-only writes
+- current project handling:
+  - default behavior still sends one mixed request so the original PLC behavior is observable
+  - practical fallbacks are available:
+    - `split_mixed_blocks=True`
+    - `retry_mixed_on_error=True`
+- remaining unknown:
+  - why this PLC rejects the one-request mixed `1406` even though the request shape is manual-aligned
 
 ### `1617` clear error visual effect
 
@@ -71,6 +85,15 @@
 - operator note:
   - the normal daily environment is usually unlocked
 
+### Mixed block write compatibility
+
+- `readBlock words+bits` on `D300 x2 + M200 x1 packed` is confirmed
+- `writeBlock words only` and `writeBlock bits only` are both confirmed
+- one-request `writeBlock mixed` is conditionally rejected with `0xC05B` on the validated target
+- the practical workaround is confirmed:
+  - `split_mixed_blocks=True`
+  - `retry_mixed_on_error=True`
+
 ### Ondemand
 
 - `2101` is treated as out of scope for normal testing in this project
@@ -84,7 +107,7 @@
 | `0x4030` | selected device/path rejected |
 | `0x4031` | configured range/allocation mismatch |
 | `0x40C0` | label-side condition failure |
-| `0xC05B` | direct `G/HG` path rejected |
+| `0xC05B` | direct `G/HG` path rejected, or one-request mixed `1406` block write rejected |
 | `0xC061` | request content/path not accepted in the current environment |
 
 Use [error_code_reference.md](error_code_reference.md) for the fuller table.
@@ -95,7 +118,8 @@ If you want to close the remaining practical gaps, the natural order is:
 
 1. explain `S` write rejection
 2. explain actual `G/HG` accepted conditions on the validated PLC
-3. determine the PLC-side prerequisites for the file family
+3. explain the PLC-side acceptance condition for one-request mixed `1406` block writes
+4. determine the PLC-side prerequisites for the file family
 
 ## 5. Related Documents
 
@@ -104,3 +128,5 @@ If you want to close the remaining practical gaps, the natural order is:
 - [iqr_r08cpu/pending_live_verification_latest.md](iqr_r08cpu/pending_live_verification_latest.md)
 - [iqr_r08cpu/special_device_probe_latest.md](iqr_r08cpu/special_device_probe_latest.md)
 - [iqr_r08cpu/manual_label_verification_latest.md](iqr_r08cpu/manual_label_verification_latest.md)
+- [iqr_r08cpu/mixed_block_compare_latest.md](iqr_r08cpu/mixed_block_compare_latest.md)
+- [iqr_r08cpu/slmp4e_connect_python_comparison_checklist.md](iqr_r08cpu/slmp4e_connect_python_comparison_checklist.md)

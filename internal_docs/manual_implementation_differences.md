@@ -4,7 +4,7 @@ This file records places where the implementation follows a practical rule that 
 
 ## Review Baseline
 
-- last updated: 2026-03-13
+- last updated: 2026-03-14
 - validated target: Mitsubishi MELSEC iQ-R `R08CPU`
 - host: `192.168.250.101`
 
@@ -87,12 +87,19 @@ Manual expectation:
 Current implementation:
 
 - default behavior still sends one mixed request
-- an optional compatibility fallback exists:
+- optional compatibility fallbacks exist:
   - `split_mixed_blocks=True`
+  - `retry_mixed_on_error=True` for `write_block(...)` on known mixed-write rejection end codes (`0xC05B` currently)
 
 Reason:
 
 - some PLC environments reject one mixed request
+
+Observed on the validated target:
+
+- one-request mixed `write_block(D300 x2 + M200 x1 packed)` returned `0xC05B`
+- the PLC memory remained unchanged after that first failed request
+- `retry_mixed_on_error=True` then succeeded by retrying as separate word-only and bit-only writes
 
 Status:
 

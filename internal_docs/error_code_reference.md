@@ -4,7 +4,7 @@ This is the maintainer-facing end-code table for the validated target.
 
 ## Scope
 
-- date: 2026-03-13
+- date: 2026-03-14
 - PLC: Mitsubishi MELSEC iQ-R `R08CPU`
 - host: `192.168.250.101`
 
@@ -24,7 +24,7 @@ This table records what the project actually observed on the validated target. I
 | `0x413E` | file family | file state/environment rejected the operation | some `18xx` file commands | keep as environment-dependent |
 | `0xC051` | long-counter and `LZ` writes | point-count or write-unit rule violation | `LZ1 x1`, some long-counter writes | treat as manual-confirmed |
 | `0xC059` | unsupported request family on the current endpoint | request family not accepted | unsupported command family on the current target | treat as out of supported scope |
-| `0xC05B` | direct `G0` / `HG0` read | direct `G/HG` path rejected | trying to use `G/HG` as normal devices | use CPU-buffer helpers instead |
+| `0xC05B` | direct `G0` / `HG0` read, first one-request mixed `1406` block write | direct path or combined request path rejected | trying to use `G/HG` as normal devices, or sending one mixed word+bit block write on the validated target | use CPU-buffer helpers for `G/HG`; use split mixed-block fallback for the mixed `1406` case |
 | `0xC061` | Appendix 1 CPU-buffer path, some file commands | request content/path not accepted in the current environment | unresolved Appendix 1 or file conditions | keep the practical alternative path |
 | `0xC075` | historical label payload attempt | payload formatting error | earlier incorrect label payload | resolved |
 | `0xC207` | file family | file environment rejected the operation | some `18xx` file commands | keep as environment-dependent |
@@ -55,6 +55,17 @@ Current practical rule:
 ### `0xC061`
 
 Do not overfit this code to one universal meaning. On this project it means the target rejected the request content/path for that context.
+
+### `0xC05B`
+
+Do not overfit this code to only one feature family either.
+
+On this project it was observed on:
+
+- direct `G/HG` normal-device access
+- the first one-request mixed `1406` block write for `D300 x2 + M200 x1 packed`
+
+For the mixed block case, the practical workaround is to retry as separate word-only and bit-only block writes.
 
 ## Related Documents
 

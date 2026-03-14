@@ -141,7 +141,8 @@ Notes:
 
 - `bit_blocks` uses packed 16-bit words, not one boolean per bit
 - mixed word/bit block access is sent as one request by default
-- if a target rejects mixed blocks, use `split_mixed_blocks=True`
+- if a target rejects mixed blocks and you always want two requests, use `split_mixed_blocks=True`
+- if you want to try one mixed request first and only fall back on known mixed-write rejection codes, use `retry_mixed_on_error=True` with `write_block(...)`
 
 ## 7. Monitor Access
 

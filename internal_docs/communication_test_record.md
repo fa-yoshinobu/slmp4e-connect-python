@@ -2,7 +2,7 @@
 
 ## Test Target
 
-- date: 2026-03-13
+- date: 2026-03-14
 - PLC: Mitsubishi MELSEC iQ-R `R08CPU`
 - host: `192.168.250.101`
 - ports: `TCP 1025`, `UDP 1027`
@@ -39,8 +39,17 @@ Observed example values:
 ### 2. Mixed block compatibility
 
 - issue: the validated PLC rejected some one-request mixed block writes
-- fix: client now splits mixed block access by default when needed
-- result: block write/readback succeeded
+- fix: the client exposes opt-in mixed-block compatibility fallbacks:
+  - `split_mixed_blocks=True`
+  - `retry_mixed_on_error=True` for `write_block(...)` on known mixed-write rejection end codes
+- 2026-03-14 live comparison result:
+  - `readBlock words+bits` on `D300 x2 + M200 x1 packed` -> `0x0000`
+  - `writeBlock words only` on `D300 x2` -> `0x0000`
+  - `writeBlock bits only` on `M200 x1 packed` -> `0x0000`
+  - first one-request `writeBlock mixed` on `D300 x2 + M200 x1 packed` -> `0xC05B`
+  - the first failed mixed write left PLC memory unchanged
+  - `retry_mixed_on_error=True` then produced `0xC05B -> 0x0000 -> 0x0000`
+- result: split retry workaround is now live-verified on the validated target
 
 ### 3. PLC setting changes
 
@@ -108,3 +117,4 @@ After PLC-side setting updates:
 - [iqr_r08cpu/special_device_probe_latest.md](iqr_r08cpu/special_device_probe_latest.md)
 - [iqr_r08cpu/manual_write_verification_latest.md](iqr_r08cpu/manual_write_verification_latest.md)
 - [iqr_r08cpu/manual_label_verification_latest.md](iqr_r08cpu/manual_label_verification_latest.md)
+- [iqr_r08cpu/mixed_block_compare_latest.md](iqr_r08cpu/mixed_block_compare_latest.md)

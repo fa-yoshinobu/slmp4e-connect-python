@@ -215,6 +215,24 @@ Use this for automated smoke checks of the currently supported writable families
 python scripts/slmp_supported_device_rw_probe.py --host 192.168.250.101 --port 1025 --transport tcp --series iqr
 ```
 
+### Mixed Block Comparison
+
+Use this when you want request/response hex plus before/after/restore details for the checklist-style `D300` + `M200` block scenarios:
+
+```powershell
+python scripts/slmp_mixed_block_compare.py --host 192.168.250.101 --port 1025 --transport tcp --series iqr
+```
+
+First-pass comparison rule:
+
+- leave `--split-mixed-blocks` off
+- leave `--retry-mixed-on-error` off
+- capture the first mixed `1406` response before enabling any compatibility fallback
+
+Report:
+
+- `internal_docs/<series>_<model>/mixed_block_compare_latest.md`
+
 ### Performance Scripts
 
 Read soak:
