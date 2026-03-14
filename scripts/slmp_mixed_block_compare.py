@@ -17,8 +17,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from slmp4e import SLMP4EClient, SLMPTarget  # noqa: E402
-from slmp4e.client import BlockReadResult  # noqa: E402
 from slmp4e.cli import _resolve_report_output, _write_text_report  # noqa: E402
+from slmp4e.client import BlockReadResult  # noqa: E402
 
 
 @dataclass(frozen=True)
@@ -660,9 +660,16 @@ def main(argv: list[str] | None = None) -> int:
         ),
         f"- Word block: {args.word_device} x{len(args.word_values)} -> {_format_values(list(args.word_values))}",
         f"- Bit block: {args.bit_device} x{len(args.bit_values)} packed -> {_format_values(list(args.bit_values))}",
-        f"- Mixed write options: split_mixed_blocks={args.split_mixed_blocks}, retry_mixed_on_error={args.retry_mixed_on_error}",
+        (
+            "- Mixed write options: "
+            f"split_mixed_blocks={args.split_mixed_blocks}, "
+            f"retry_mixed_on_error={args.retry_mixed_on_error}"
+        ),
         f"- Keep written value: {args.keep_written_value}",
-        "- First-pass comparison recommendation: keep both mixed-write fallback options disabled so the first PLC response is preserved",
+        (
+            "- First-pass comparison recommendation: keep both mixed-write "
+            "fallback options disabled so the first PLC response is preserved"
+        ),
         (
             "- Note: if retry_mixed_on_error=True triggers an internal retry, the reported memory-changed state is the "
             "post-call state, not an observation between the first failed request and the retry"
