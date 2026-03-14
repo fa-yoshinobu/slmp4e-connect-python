@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.2 - 2026-03-14
+
+Patch release to align the repository release tag with the CI-passing commit.
+
+### Fixed
+
+- formatted `scripts/slmp_mixed_block_compare.py` so `ruff check .` passes in GitHub Actions
+- release line now points to the same commit that passed unit tests, `ruff`, `mypy`, and package build
+
 ## 0.1.1 - 2026-03-14
 
 Mixed block write compatibility update for the validated iQ-R target.

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slmp4e-connect-python"
-version = "0.1.1"
+version = "0.1.2"
 description = "SLMP4E Connect Python: client library for Mitsubishi SLMP 4E binary communication"
 readme = "README.md"
 requires-python = ">=3.10"

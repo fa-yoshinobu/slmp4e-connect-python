@@ -41,7 +41,7 @@ Optional packaging smoke check:
 
 ```powershell
 python -m venv %TEMP%\\slmp4e_release_smoke
-%TEMP%\\slmp4e_release_smoke\\Scripts\\python.exe -m pip install .\\dist\\slmp4e_connect_python-0.1.1-py3-none-any.whl
+%TEMP%\\slmp4e_release_smoke\\Scripts\\python.exe -m pip install .\\dist\\slmp4e_connect_python-0.1.2-py3-none-any.whl
 %TEMP%\\slmp4e_release_smoke\\Scripts\\python.exe -c "import slmp4e; print(slmp4e.__version__)"
 %TEMP%\\slmp4e_release_smoke\\Scripts\\slmp4e-connection-check.exe --help
 ```
@@ -102,5 +102,5 @@ Then:
 
 ## 8. Current Baseline
 
-- package version: `0.1.1`
+- package version: `0.1.2`
 - validated target: Mitsubishi MELSEC iQ-R `R08CPU`
