@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Samples: Restore only confirmed test writes in reverse order; preserve outcome-unknown failures without further writes.
+- Tests: Exercise sample cleanup after rejected writes, readback failures, and uncertain write or restoration outcomes.
+- Docs: Add the missing `SlmpTarget` import to the block-read example and correct the named-write docstring.
+- Samples: Keep bit-in-word operations out of the single-request named-write example.
+
 ## [5.2.0] - 2026-09-03
 
 - Release: Bumped package metadata and `slmp.__version__` to `5.2.0` for the approved high-level API overhaul.

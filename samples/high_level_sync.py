@@ -31,6 +31,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from slmp import (
     SlmpConnectionOptions,
+    SlmpOutcomeUnknownError,
     SlmpTarget,
     format_address,
     normalize_address,
@@ -162,16 +163,31 @@ def main() -> None:
         val_l = read_typed_sync(client, "D202", "L")  # signed 32-bit (2 words)
         print(f"[read_typed_sync] D100(U)={val_u}  D101(S)={val_s}  D200(F)={val_f}  D202(L)={val_l}")
 
+        write_1_confirmed = False
+        write_2_confirmed = False
+        write_3_confirmed = False
+        outcome_unknown = False
         try:
             write_typed_sync(client, "D100", "U", 42)
+            write_1_confirmed = True
             write_typed_sync(client, "D200", "F", 3.14)
+            write_2_confirmed = True
             write_typed_sync(client, "D202", "L", -100)
+            write_3_confirmed = True
             print("[write_typed_sync] Wrote 42->D100, 3.14->D200, -100->D202")
+        except SlmpOutcomeUnknownError:
+            outcome_unknown = True
+            raise
         finally:
-            write_typed_sync(client, "D100", "U", val_u)
-            write_typed_sync(client, "D200", "F", val_f)
-            write_typed_sync(client, "D202", "L", val_l)
-            print("[write_typed_sync] Restored D100, D200, D202")
+            if not outcome_unknown:
+                if write_3_confirmed:
+                    write_typed_sync(client, "D202", "L", val_l)
+                if write_2_confirmed:
+                    write_typed_sync(client, "D200", "F", val_f)
+                if write_1_confirmed:
+                    write_typed_sync(client, "D100", "U", val_u)
+                if write_1_confirmed or write_2_confirmed or write_3_confirmed:
+                    print("Restored confirmed test writes.")
 
         # ---------------------------------------------------------------
         # 2. explicit contiguous helpers
@@ -200,14 +216,24 @@ def main() -> None:
         # ---------------------------------------------------------------
         original = read_named_sync(client, ["D50.3"])
         original_bit = bool(original["D50.3"])
+        write_confirmed = False
+        outcome_unknown = False
         try:
             write_bit_in_word_sync(client, "D50", bit_index=3, value=True)
+            write_confirmed = True
             print("[write_bit_in_word_sync] Set bit 3 of D50")
             write_bit_in_word_sync(client, "D50", bit_index=3, value=False)
+            write_confirmed = True
             print("[write_bit_in_word_sync] Cleared bit 3 of D50")
+        except SlmpOutcomeUnknownError:
+            outcome_unknown = True
+            raise
         finally:
-            write_bit_in_word_sync(client, "D50", bit_index=3, value=original_bit)
-            print("[write_bit_in_word_sync] Restored bit 3 of D50")
+            if not outcome_unknown:
+                if write_confirmed:
+                    write_bit_in_word_sync(client, "D50", bit_index=3, value=original_bit)
+                if write_confirmed:
+                    print("Restored confirmed test writes.")
 
         # ---------------------------------------------------------------
         # 4. read_named_sync / write_named_sync
@@ -236,6 +262,8 @@ def main() -> None:
         for addr, value in named_values.items():
             print(f"[read_named_sync]  {addr} = {value!r}")
 
+        write_confirmed = False
+        outcome_unknown = False
         try:
             write_named_sync(
                 client,
@@ -243,13 +271,21 @@ def main() -> None:
                     "D100:U": 99,
                     "D200:F": 1.5,
                     "D202:L": -200,
-                    "D50.3": True,
                 },
             )
-            print("[write_named_sync] Wrote mixed-type values to D100:U, D200:F, D202:L, D50.3")
+            write_confirmed = True
+            print("[write_named_sync] Wrote word/DWord values to D100:U, D200:F, D202:L")
+        except SlmpOutcomeUnknownError:
+            outcome_unknown = True
+            raise
         finally:
-            write_named_sync(client, named_values)
-            print("[write_named_sync] Restored mixed-type values")
+            if not outcome_unknown:
+                if write_confirmed:
+                    write_named_sync(
+                        client, {address: named_values[address] for address in ("D100:U", "D200:F", "D202:L")}
+                    )
+                if write_confirmed:
+                    print("Restored confirmed test writes.")
 
         # ---------------------------------------------------------------
         # 5. poll_sync

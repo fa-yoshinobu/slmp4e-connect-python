@@ -450,3 +450,17 @@ def test_bit_in_word_example_restores_after_readback_failure_but_not_unknown_wri
     else:
         raise AssertionError("the simulated outcome-unknown write must propagate")
     assert client.writes == [True]
+
+
+def test_block_read_example_constructs_options_without_connecting() -> None:
+    block = _block_containing(
+        _python_blocks(USAGE_GUIDE.read_text(encoding="utf-8")),
+        'words = await read_words_single_request(client, "D0", 10)',
+    )
+    tree = ast.parse(block)
+    imports = [node for node in tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
+    main = next(node for node in tree.body if isinstance(node, ast.AsyncFunctionDef))
+    assignment = next(node for node in main.body if isinstance(node, ast.Assign))
+    namespace: dict[str, Any] = {}
+    exec(compile(ast.Module(body=[*imports, assignment], type_ignores=[]), "block reads", "exec"), namespace)
+    assert namespace["options"].default_target is not None

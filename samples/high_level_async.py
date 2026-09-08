@@ -32,6 +32,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from slmp import (
     SlmpConnectionOptions,
+    SlmpOutcomeUnknownError,
     SlmpTarget,
     format_address,
     normalize_address,
@@ -158,16 +159,31 @@ async def demo_typed_rw(client: AsyncSlmpClient) -> None:
     val_l = await read_typed(client, "D202", "L")
     print(f"[read_typed] D100(U)={val_u}  D200(F)={val_f}  D202(L)={val_l}")
 
+    write_1_confirmed = False
+    write_2_confirmed = False
+    write_3_confirmed = False
+    outcome_unknown = False
     try:
         await write_typed(client, "D100", "U", 42)
+        write_1_confirmed = True
         await write_typed(client, "D200", "F", 3.14)
+        write_2_confirmed = True
         await write_typed(client, "D202", "L", -100)
+        write_3_confirmed = True
         print("[write_typed] Wrote 42->D100, 3.14->D200, -100->D202")
+    except SlmpOutcomeUnknownError:
+        outcome_unknown = True
+        raise
     finally:
-        await write_typed(client, "D100", "U", val_u)
-        await write_typed(client, "D200", "F", val_f)
-        await write_typed(client, "D202", "L", val_l)
-        print("[write_typed] Restored D100, D200, D202")
+        if not outcome_unknown:
+            if write_3_confirmed:
+                await write_typed(client, "D202", "L", val_l)
+            if write_2_confirmed:
+                await write_typed(client, "D200", "F", val_f)
+            if write_1_confirmed:
+                await write_typed(client, "D100", "U", val_u)
+            if write_1_confirmed or write_2_confirmed or write_3_confirmed:
+                print("Restored confirmed test writes.")
 
 
 async def demo_contiguous_reads(client: AsyncSlmpClient) -> None:
@@ -200,14 +216,24 @@ async def demo_bit_in_word(client: AsyncSlmpClient) -> None:
     """
     original = await read_named(client, ["D50.3"])
     original_bit = bool(original["D50.3"])
+    write_confirmed = False
+    outcome_unknown = False
     try:
         await write_bit_in_word(client, "D50", bit_index=3, value=True)
+        write_confirmed = True
         print("[write_bit_in_word] Set   bit 3 of D50")
         await write_bit_in_word(client, "D50", bit_index=3, value=False)
+        write_confirmed = True
         print("[write_bit_in_word] Clear bit 3 of D50")
+    except SlmpOutcomeUnknownError:
+        outcome_unknown = True
+        raise
     finally:
-        await write_bit_in_word(client, "D50", bit_index=3, value=original_bit)
-        print("[write_bit_in_word] Restored bit 3 of D50")
+        if not outcome_unknown:
+            if write_confirmed:
+                await write_bit_in_word(client, "D50", bit_index=3, value=original_bit)
+            if write_confirmed:
+                print("Restored confirmed test writes.")
 
 
 async def demo_named_rw(client: AsyncSlmpClient) -> None:
@@ -237,6 +263,8 @@ async def demo_named_rw(client: AsyncSlmpClient) -> None:
     for addr, value in named_values.items():
         print(f"[read_named]  {addr} = {value!r}")
 
+    write_confirmed = False
+    outcome_unknown = False
     try:
         await write_named(
             client,
@@ -244,13 +272,21 @@ async def demo_named_rw(client: AsyncSlmpClient) -> None:
                 "D100:U": 99,
                 "D200:F": 1.5,
                 "D202:L": -200,
-                "D50.3": True,
             },
         )
-        print("[write_named] Wrote mixed-type values")
+        write_confirmed = True
+        print("[write_named] Wrote word/DWord values")
+    except SlmpOutcomeUnknownError:
+        outcome_unknown = True
+        raise
     finally:
-        await write_named(client, named_values)
-        print("[write_named] Restored mixed-type values")
+        if not outcome_unknown:
+            if write_confirmed:
+                await write_named(
+                    client, {address: named_values[address] for address in ("D100:U", "D200:F", "D202:L")}
+                )
+            if write_confirmed:
+                print("Restored confirmed test writes.")
 
 
 async def demo_poll(client: AsyncSlmpClient, count: int) -> None:

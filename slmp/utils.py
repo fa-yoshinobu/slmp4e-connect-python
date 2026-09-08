@@ -592,8 +592,9 @@ async def write_named(
 ) -> None:
     """Write a mixed logical collection by address string.
 
-    ``D50.3`` updates one bit inside one word. Direct bit devices such as
-    ``M1000`` are normalized to ``"BIT"`` writes.
+    Bit-in-word addresses such as ``D50.3`` require the explicit
+    :func:`write_bit_in_word` helper. Direct bit destinations cannot be mixed
+    with word/DWord destinations in this single-request helper.
     """
     word_values, dword_values, bit_values = _compile_named_write(updates, _client_address_profile(client))
     if bit_values:

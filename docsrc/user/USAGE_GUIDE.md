@@ -469,6 +469,7 @@ does not invent a family fallback.
 import asyncio
 from slmp import (
     SlmpConnectionOptions,
+    SlmpTarget,
     open_and_connect,
     read_dwords_single_request,
     read_words_single_request,
